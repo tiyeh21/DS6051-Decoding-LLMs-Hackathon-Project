@@ -8,7 +8,7 @@ stats.nba.com (LeagueDashPlayerStats endpoint) and writes:
   data/nba_player_stats_<SEASON>.csv   one file per season
 
 Usage:
-    python data/fetch_nba_stats.py                      # last 5 seasons, per-game
+    python data/fetch_nba_stats.py                      # 2014-15..2023-24, per-game
     python data/fetch_nba_stats.py --start 2015 --end 2024
     python data/fetch_nba_stats.py --per-mode Totals    # season totals instead
 
@@ -56,8 +56,8 @@ def fetch_season(start_year: int, per_mode: str, sleep: float) -> pd.DataFrame:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--start", type=int, default=2019,
-                   help="first season start year (default: 2019)")
+    p.add_argument("--start", type=int, default=2014,
+                   help="first season start year (default: 2014)")
     p.add_argument("--end", type=int, default=2023,
                    help="last season start year, inclusive (default: 2023)")
     p.add_argument("--per-mode", default="PerGame",

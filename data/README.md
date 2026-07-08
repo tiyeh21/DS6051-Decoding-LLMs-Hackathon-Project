@@ -13,7 +13,7 @@ player-stat metrics (hallucination rate, calibration ground truth, etc.).
 ## Provenance
 - **Source:** `stats.nba.com` via the [`nba_api`](https://github.com/swar/nba_api)
   package — endpoint `LeagueDashPlayerStats`, `Regular Season`, `PerGame`.
-- **Seasons:** 2019-20 through 2023-24 (5 seasons, 2,785 player-season rows).
+- **Seasons:** 2014-15 through 2023-24 (10 seasons, 5,309 player-season rows).
 - **Fetched:** 2026-07-08.
 - **Key columns:** `SEASON, PLAYER_ID, PLAYER_NAME, TEAM_ABBREVIATION, AGE, GP,
   MIN, PTS, REB, AST, STL, BLK, TOV, FG_PCT, FG3_PCT, FT_PCT, PLUS_MINUS` (plus
@@ -22,7 +22,7 @@ player-stat metrics (hallucination rate, calibration ground truth, etc.).
 ## Regenerate / extend
 ```bash
 pip install nba_api pandas
-python data/fetch_nba_stats.py                    # default: 2019-20..2023-24, PerGame
+python data/fetch_nba_stats.py                    # default: 2014-15..2023-24, PerGame
 python data/fetch_nba_stats.py --start 2015 --end 2024
 python data/fetch_nba_stats.py --per-mode Totals  # season totals instead of per-game
 ```
