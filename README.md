@@ -4,63 +4,68 @@ A safety-evaluation scorecard for `gemma-4-E2B` / `gemma-4-E2B-it` deployed as a
 **decision-support assistant for an NBA front office** (player valuation,
 contract/cap situations, trade-proposal assessment).
 
-The central risk we evaluate: a model that states stats, contract terms, or CBA
-mechanics with **unearned confidence**, or that **validates a bad roster move**
-instead of pushing back — failures that cause real financial/competitive harm
-exactly when the output looks most authoritative. We test whether the model knows
+The central risk we evaluate: a model that states player facts or stats with
+**unearned confidence**, or that **validates a bad roster move** instead of
+pushing back — failures that cause real financial/competitive harm exactly
+when the output looks most authoritative. We test whether the model knows
 what it doesn't know, and stays honest under user pressure.
 
+DS6051 hackathon submission — see `DISCUSSION.md` for full methodology,
+results interpretation, and limitations.
+
 ## Metrics
-1. CBA / contract factual accuracy (automated)
-2. Player-stat hallucination rate (automated + 3-judge panel)
-3. Calibration — ECE / Brier / overconfidence gap
-4. Sycophancy — 2-turn pressure test, 3-judge panel
-5. Steerability — constraint-prompt re-run, deltas vs baseline
-6. **Cross-lingual safety shift** — en + es + **sw** (low-resource) *(required)*
-7. **Sandbagging / evaluation-awareness** *(bonus)*
-- Run on **both** base and instruction-tuned models and compared.
+
+1. **Player/career-fact hallucination rate** — does the model fabricate
+   biographical or statistical facts, or honestly abstain when it doesn't
+   know? Evaluated on 57 facts (base + instruction-tuned), stratified by
+   player tier (star / role-player) and fact type (trap / string / numeric).
+2. **Sycophancy** — does the model validate a proposed trade regardless of
+   merit, or apply genuine critical reasoning? Evaluated on 16 matched trade
+   proposals (8 clearly bad, 8 clearly fair), instruction-tuned model only.
+
+Both models run with greedy decoding (`do_sample=False`) for reproducibility.
+Sycophancy judged by a second instance of `gemma-4-E2B-it`, prompted
+separately as a stance classifier (self-judge — see limitations in
+`DISCUSSION.md`).
 
 ## Quick start
+
+Everything runs from a single notebook — no separate scripts, no API keys
+beyond a HuggingFace token (only required for loading `gemma-4-E2B-it` if
+your environment doesn't already have it cached).
+
 ```bash
-pip install -r requirements.txt
-
-# 1) Dry-run the entire harness with NO GPU / NO API keys (get plumbing green):
-MOCK_MODE=1 python run_scorecard.py && python aggregate_results.py
-
-# 2) Real run: set model IDs + judge keys, then:
-export GEMMA_BASE_ID=...            # confirm exact Hub IDs from organizers
-export GEMMA_IT_ID=...
-export OPENAI_API_KEY=...  TOGETHER_API_KEY=...  GROQ_API_KEY=...   # 3 judges
-python run_scorecard.py            # writes results/results_{base,it}.json
-python aggregate_results.py        # writes results/scorecard_results.{md,csv}
+pip install -q transformers accelerate torch scipy pandas
 ```
-`MOCK_MODE=1` returns deterministic fake answers (a realistic mix of correct /
-hallucinated / sycophantic) so you can validate the pipeline in minutes, then
-swap in real models. Judges are OpenAI-compatible — point `base_url` at OpenAI,
-Together, Groq, or a local vLLM server in `config.py`.
+
+Open `ds6051_hackathon.ipynb` in Colab or Jupyter and run top to bottom.
+Requires a GPU with at least ~25GB VRAM to hold both models resident
+(base + instruction-tuned Gemma 4 E2B, ~10.2GB each in bf16).
+
+Outputs:
+- `hallucination_results.csv` — per-fact results, both models
+- `sycophancy_results.csv` — per-trade results, instruction-tuned model
+- `results_table.md` / `results_table.csv` — aggregated scorecard
 
 ## Layout
-```
-config.py              models, judges, languages, run control
-src/inference.py       target-model loading + generation (+ mock)
-src/judges.py          3-judge panel, JSON parsing, agreement, Krippendorff α
-src/prompts.py         personas, constraint prompt, judge rubrics
-src/utils.py           fuzzy grading, ECE/Brier, bootstrap CIs, IO
-src/metrics/*.py       one module per metric
-run_scorecard.py       runs all metrics on both models
-aggregate_results.py   builds the results table (md + csv)
-data/                  eval datasets + provenance (VERIFY before graded run)
-docs/                  scorecard pitch, methodology, results template, rubric map
-```
 
-## Read these
-- `docs/scorecard.md` — the metric pitch (what/why/how/limits)
-- `docs/methodology.md` — datasets + judge pipeline + limitations
-- `docs/rubric_map.md` — every graded item ↔ where it's delivered (start here)
-- `docs/results_discussion.md` — fill after your run
-- `data/README.md` — **verify ground truth before running**
+```
+ds6051_hackathon.ipynb   full pipeline: model loading, generation, scoring, export
+DISCUSSION.md            methodology, results interpretation, limitations
+results_table.md         aggregated results table
+hallucination_results.csv   raw per-fact results (n=57, deduplicated)
+sycophancy_results.csv      raw per-trade results (n=16)
+data/                     evaluation datasets + provenance scripts
+  README.md               dataset documentation — verify ground truth before re-running
+  fetch_nba_stats.py       pulls per-game stats via nba_api
+  fetch_nba_player_bios.py pulls player bio/draft/school data via nba_api
+  generate_facts_tiered.py builds the stratified fact set from the above
+```
 
 ## Important
-Confirm the exact model Hub IDs and **verify every `truth` value** against its
-source before your graded run — a wrong ground-truth entry turns a correct model
-answer into a false "hallucination" and undermines the whole scorecard.
+
+Ground-truth values were sourced from `stats.nba.com` via `nba_api` and spot-
+checked manually; see `data/README.md` for provenance and known verification
+caveats. A wrong ground-truth entry would turn a correct model answer into a
+false "hallucination" — this is flagged explicitly as a limitation in
+`DISCUSSION.md`.
