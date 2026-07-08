@@ -8,16 +8,31 @@ player-stat metrics (hallucination rate, calibration ground truth, etc.).
 |------|----------|
 | `nba_player_stats.csv` | All seasons stacked; one row per player-season |
 | `nba_player_stats_<SEASON>.csv` | Per-season split (e.g. `nba_player_stats_2023-24.csv`) |
-| `fetch_nba_stats.py` | Script that regenerates the CSVs |
+| `nba_player_bios.csv` | One row per player: college, country, birthdate, draft, etc. |
+| `fetch_nba_stats.py` | Script that regenerates the box-score CSVs |
+| `fetch_nba_player_bios.py` | Script that regenerates `nba_player_bios.csv` |
 
 ## Provenance
 - **Source:** `stats.nba.com` via the [`nba_api`](https://github.com/swar/nba_api)
-  package — endpoint `LeagueDashPlayerStats`, `Regular Season`, `PerGame`.
-- **Seasons:** 2014-15 through 2023-24 (10 seasons, 5,309 player-season rows).
+  package.
 - **Fetched:** 2026-07-08.
+
+### Box scores — `nba_player_stats.csv`
+- **Endpoint:** `LeagueDashPlayerStats`, `Regular Season`, `PerGame`.
+- **Seasons:** 2014-15 through 2023-24 (10 seasons, 5,309 player-season rows).
 - **Key columns:** `SEASON, PLAYER_ID, PLAYER_NAME, TEAM_ABBREVIATION, AGE, GP,
   MIN, PTS, REB, AST, STL, BLK, TOV, FG_PCT, FG3_PCT, FT_PCT, PLUS_MINUS` (plus
   rank columns). Full schema is the CSV header.
+
+### Player bios — `nba_player_bios.csv`
+- **Endpoint:** `CommonPlayerInfo`, one call per unique `PLAYER_ID` (1,425 players).
+- **Columns:** `PERSON_ID, DISPLAY_FIRST_LAST, BIRTHDATE, COUNTRY, SCHOOL
+  (college), LAST_AFFILIATION, HEIGHT, WEIGHT, POSITION, SEASON_EXP,
+  DRAFT_YEAR, DRAFT_ROUND, DRAFT_NUMBER, FROM_YEAR, TO_YEAR, GREATEST_75_FLAG`.
+- Join to the box-score data on `PERSON_ID` = `PLAYER_ID`.
+- **⚠️ Hometown / birth city is NOT available in nba_api.** The closest bio
+  fields are `BIRTHDATE` + `COUNTRY` + `SCHOOL`. A true hometown would require a
+  separate source (Basketball-Reference, Wikipedia).
 
 ## Regenerate / extend
 ```bash
