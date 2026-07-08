@@ -2,14 +2,14 @@
 
 | Metric                                           | Model                              |   n | Result                     |
 |:-------------------------------------------------|:-----------------------------------|----:|:---------------------------|
-| Hallucination-free rate (overall)                | Base (gemma-4-E2B)                 |  58 | 27.6% (95% CI 17.8%–40.2%) |
-| Hallucination-free rate (overall)                | Instruction-tuned (gemma-4-E2B-it) |  58 | 15.5% (95% CI 8.4%–26.9%)  |
-| Hallucination-free rate — star tier              | Base                               |  28 | 50.0% (95% CI 32.6%–67.4%) |
-| Hallucination-free rate — star tier              | IT                                 |  28 | 21.4% (95% CI 10.2%–39.5%) |
+| Hallucination-free rate (overall)                | Base (gemma-4-E2B)                 |  57 | 28.1% (95% CI 18.1%–40.8%) |
+| Hallucination-free rate (overall)                | Instruction-tuned (gemma-4-E2B-it) |  57 | 15.8% (95% CI 8.5%–27.4%)  |
+| Hallucination-free rate — star tier              | Base                               |  27 | 51.9% (95% CI 34.0%–69.3%) |
+| Hallucination-free rate — star tier              | IT                                 |  27 | 22.2% (95% CI 10.6%–40.8%) |
 | Hallucination-free rate — role_player tier       | Base                               |  30 | 6.7% (95% CI 1.8%–21.3%)   |
 | Hallucination-free rate — role_player tier       | IT                                 |  30 | 10.0% (95% CI 3.5%–25.6%)  |
-| Hallucination-free rate — trap facts             | Base                               |  15 | 13.3% (95% CI 3.7%–37.9%)  |
-| Hallucination-free rate — trap facts             | IT                                 |  15 | 13.3% (95% CI 3.7%–37.9%)  |
+| Hallucination-free rate — trap facts             | Base                               |  14 | 14.3% (95% CI 4.0%–39.9%)  |
+| Hallucination-free rate — trap facts             | IT                                 |  14 | 14.3% (95% CI 4.0%–39.9%)  |
 | Hallucination-free rate — string facts           | Base                               |  23 | 52.2% (95% CI 33.0%–70.8%) |
 | Hallucination-free rate — string facts           | IT                                 |  23 | 17.4% (95% CI 7.0%–37.1%)  |
 | Hallucination-free rate — numeric facts          | Base                               |  20 | 10.0% (95% CI 2.8%–30.1%)  |
@@ -21,5 +21,5 @@
 
 | Behavior on failed responses (IT)   |   Count | % of IT fails   |
 |:------------------------------------|--------:|:----------------|
-| answered                            |      38 | 77.6%           |
-| abstain                             |      11 | 22.4%           |
+| answered                            |      37 | 77.1%           |
+| abstain                             |      11 | 22.9%           |
